@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<database>
+
+    <name>*dbname*</name>
+    <create>true</create>
+    <overwrite>false</overwrite>
+    <charset>utf8</charset>
+
+    <!--
+		Patient metadata table containing one row for each DICOM patient.
+		 - patient_id (PK)
+		 - patient_name
+		 - patient_sex
+		 - patient_dob
+		-->
+    <table>
+        <name>*dbprefix*dicomviewer_patient</name>
+        <declaration>
+            <field>
+                <name>patient_id</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <field>
+                <name>patient_name</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>256</length>
+            </field>
+            <field>
+                <name>patient_sex</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>16</length>
+            </field>
+            <field>
+                <name>patient_dob</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>32</length>
+            </field>
+            <index>
+                <name>dicomviewer_patient_index</name>
+                <unique>true</unique>
+                <primary>true</primary>
+                <field>
+                    <name>patient_id</name>
+                </field>
+            </index>
+        </declaration>
+    </table>
+
+    <!--
+		Study metadata table containing one row for each DICOM study.
+		 - study_instance_uid (PK)
+		 - accession_number
+		 - study_date
+		 - study_time
+		 - study_description
+		 - institution_name
+		 - patient_id (FK)
+		-->
+    <table>
+        <name>*dbprefix*dicomviewer_study</name>
+        <declaration>
+            <field>
+                <name>study_instance_uid</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <field>
+                <name>accession_number</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>64</length>
+            </field>
+            <field>
+                <name>study_date</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>32</length>
+            </field>
+            <field>
+                <name>study_time</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>32</length>
+            </field>
+            <field>
+                <name>study_description</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>512</length>
+            </field>
+            <field>
+                <name>institution_name</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>512</length>
+            </field>
+            <!-- Foreign Key dicomviewer_patient::patient_id -->
+            <field>
+                <name>patient_id</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <index>
+                <name>dicomviewer_study_index</name>
+                <unique>true</unique>
+                <primary>true</primary>
+                <field>
+                    <name>study_instance_uid</name>
+                </field>
+            </index>
+        </declaration>
+    </table>
+
+    <!--
+		Series metadata table containing one row for each DICOM series.
+		 - series_instance_uid (PK)
+		 - series_description
+		 - series_number
+		 - series_date
+		 - series_time
+		 - modality
+		 - study_instance_uid (FK)
+		-->
+    <table>
+        <name>*dbprefix*dicomviewer_series</name>
+        <declaration>
+            <field>
+                <name>series_instance_uid</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <field>
+                <name>series_description</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>512</length>
+            </field>
+            <field>
+                <name>series_number</name>
+                <type>integer</type>
+                <notnull>false</notnull>
+                <length>4</length>
+            </field>
+            <field>
+                <name>series_date</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>32</length>
+            </field>
+            <field>
+                <name>series_time</name>
+                <type>text</type>
+                <notnull>false</notnull>
+                <length>32</length>
+            </field>
+            <field>
+                <name>modality</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>16</length>
+            </field>
+            <!-- Foreign Key dicomviewer_study::study_instance_uid -->
+            <field>
+                <name>study_instance_uid</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <index>
+                <name>dicomviewer_series_index</name>
+                <unique>true</unique>
+                <primary>true</primary>
+                <field>
+                    <name>series_instance_uid</name>
+                </field>
+            </index>
+        </declaration>
+    </table>
+
+    <!--
+		Instance metadata table containing one row for each DICOM instance file.
+		 - sop_instance_uid (PK)
+		 - sop_class_uid
+		 - instance_number
+		 - file_path
+		 - file_path_hash (MD5 hash of file_path, used in queries instead of file_path)
+		 - series_instance_uid (FK)
+		-->
+    <table>
+        <name>*dbprefix*dicomviewer_instance</name>
+        <declaration>
+            <field>
+                <name>sop_instance_uid</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <field>
+                <name>sop_class_uid</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <field>
+                <name>instance_number</name>
+                <type>integer</type>
+                <notnull>false</notnull>
+                <length>4</length>
+            </field>
+            <field>
+                <name>file_path</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>4000</length>
+            </field>
+            <field>
+                <name>file_path_hash</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>32</length>
+            </field>
+            <!-- Foreign Key dicomviewer_series::series_instance_uid -->
+            <field>
+                <name>series_instance_uid</name>
+                <type>text</type>
+                <notnull>true</notnull>
+                <length>64</length>
+            </field>
+            <index>
+                <name>dicomviewer_instance_index</name>
+                <unique>true</unique>
+                <primary>true</primary>
+                <field>
+                    <name>sop_instance_uid</name>
+                </field>
+            </index>
+            <index>
+                <name>file_path_hash_index</name>
+                <unique>true</unique>
+                <field>
+                    <name>file_path_hash</name>
+                    <sorting>ascending</sorting>
+                </field>
+            </index>
+        </declaration>
+    </table>
+
+</database>
